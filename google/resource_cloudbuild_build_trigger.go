@@ -95,6 +95,20 @@ func resourceCloudBuildTrigger() *schema.Resource {
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"ignored_files": &schema.Schema{
+				Optional:      true,
+				Type:          schema.TypeList,
+				ForceNew:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"build"},
+			},
+			"included_files": &schema.Schema{
+				Optional:      true,
+				Type:          schema.TypeList,
+				ForceNew:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"build"},
+			},
 			"trigger_template": &schema.Schema{
 				Optional: true,
 				Type:     schema.TypeList,
@@ -154,6 +168,14 @@ func resourceCloudbuildBuildTriggerCreate(d *schema.ResourceData, meta interface
 		buildTrigger.Description = v.(string)
 	}
 
+	if v, ok := d.GetOk("ignored_files"); ok {
+		buildTrigger.IgnoredFiles = v.([]string)
+	}
+
+	if v, ok := d.GetOk("included_files"); ok {
+		buildTrigger.IncludedFiles = v.([]string)
+	}
+
 	if v, ok := d.GetOk("filename"); ok {
 		buildTrigger.Filename = v.(string)
 	} else {
@@ -194,6 +216,8 @@ func resourceCloudbuildBuildTriggerRead(d *schema.ResourceData, meta interface{}
 
 	d.Set("description", buildTrigger.Description)
 	d.Set("substitutions", buildTrigger.Substitutions)
+	d.Set("included_files", buildTrigger.IncludedFiles)
+	d.Set("ignored_files", buildTrigger.IgnoredFiles)
 
 	if buildTrigger.TriggerTemplate != nil {
 		d.Set("trigger_template", flattenCloudbuildBuildTriggerTemplate(d, config, buildTrigger.TriggerTemplate))

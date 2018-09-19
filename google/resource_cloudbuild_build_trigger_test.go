@@ -242,7 +242,14 @@ resource "google_cloudbuild_trigger" "filename_build_trigger" {
   substitutions {
     _FOO = "bar"
     _BAZ = "qux"
-  }
+	}
+	ignored_files [
+		".gitignore"
+	]
+	included_files [
+		"build/*.java",
+		"test/*"
+	]
   filename = "cloudbuild.yaml"
 }
   `, projectID, projectID, projectOrg, projectBillingAccount)
